@@ -1,9 +1,9 @@
 #include <iostream>
-#include "config.h"
+#include "helloworld_lib.h"
 
 int main(int, char**)
 {
-	std::cout << "Version: " << PROJECT_VERSION << std::endl;
+	std::cout << "Version: " << GetVersion() << std::endl;
 	std::cout << "Hello, World!" << std::endl;
 
 	return 0;
