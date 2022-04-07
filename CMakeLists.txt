@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(PATCH_VERSION 3)
+#set(PATCH_VERSION 3)
+set(PATCH_VERSION "1" CACHE INTERNAL "Patch version")
 project(helloworld VERSION 0.0.${PATCH_VERSION})
 
 set(ROOT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
