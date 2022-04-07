@@ -27,6 +27,9 @@ jobs:
 
     # установка буста
     - run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
+    - run: cmake -B ${{github.workspace}}/build -DPATCH_VERSION=${{github.run_number}}
+    - run: cmake --build ${{github.workspace}}/build
+    - run: cmake --build ${{github.workspace}}/build --target package
 
     - name: Configure
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -40,7 +43,7 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --target package
       
     - name: List
-      run: ls -la
+      run: ls -la build
       
     - name: Create
       id: create
