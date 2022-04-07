@@ -68,5 +68,5 @@ jobs:
     steps:
       # при помощи name обозначаем таски внутри джоба (они печатаются)
       - name: Hello Actions
-        #run: echo "VAR1 ${{VAR1}}"
+        run: echo "VAR1 ${{VAR1}}"
         #run: echo "Git hash: ${{ env.var }} "
