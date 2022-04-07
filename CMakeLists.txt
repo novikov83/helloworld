@@ -1,16 +1,18 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(HelloWorld VERSION 0.0.7)
+set(PATCH_VERSION 3)
+project(helloworld VERSION 0.0.${PATCH_VERSION})
 
 set(ROOT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 option(WITH_BOOST_TEST "Boost tests" ON)
 
-add_subdirectory(helloworld_cli)
-add_subdirectory(helloworld_lib)
+add_subdirectory(helloworld)
+add_subdirectory(lib)
 add_subdirectory(tests)
 
-#install(TARGETS helloworld_cli RUNTIME DESTINATION bin)
+install(TARGETS helloworld RUNTIME DESTINATION bin)
+install(TARGETS version RUNTIME DESTINATION lib)
 
 # Создание пакета deb
 # cmake --build . --target package
