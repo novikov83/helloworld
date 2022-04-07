@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.8)
 
 project(HelloWorldTests VERSION 0.0.7)
 
-option(WITH_BOOST_TEST "Boost tests" ON)
-
 if (WITH_BOOST_TEST)
 	find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
