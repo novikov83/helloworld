@@ -1,45 +1,39 @@
 # Имя может быть любое, но желательно без пробелов
-name: CMake
+name: HelloWorld
 
 on:
   push:
+    # должно срабатывать на создание tag в ветке master
     tags: [ mater ]
+    # срабатывает на push в ветку master
     branches: [ master ]
 
 # глобальные переменные
 env:
-  var: 10
-  var_uniq: ${{ github.sha }}
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  VAR1: 777
+  VAR2: ${{github.sha}}
 
 jobs:
   # build это просто имя - можно давать любое имя. Это будет название джоба. Каждый джоб запускается на своей виртуальной машине
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    # операционная система
     runs-on: ubuntu-latest
 
+    # обязательная секция
     steps:
     # чекаут нашего проекта
     - uses: actions/checkout@v3
 
     # установка буста
     - run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
-    - run: cmake -B ${{github.workspace}}/build -DPATCH_VERSION=${{github.run_number}}
-    - run: cmake --build ${{github.workspace}}/build
-    - run: cmake --build ${{github.workspace}}/build --target package
 
     - name: Configure
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: cmake -B ${{github.workspace}}/build -DPATCH_VERSION=${{github.run_number}}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build
       
-    - name: Build DEB
+    - name: Package
       run: cmake --build ${{github.workspace}}/build --target package
       
     - name: List
@@ -49,10 +43,10 @@ jobs:
       id: create
       uses: actions/create-release@v1
       env: 
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       with:
-        tag_name: ${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
+        tag_name: ${{github.run_number}}
+        release_name: Release ${{github.run_number}}
         draft: false
         prerelease: false
 
@@ -60,20 +54,19 @@ jobs:
       id: upload
       uses: actions/upload-release-asset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       with:
-        upload_url: ${{ steps.create.outputs.upload_url }}
-        asset_path: ./build/helloworld-0.0.${{ github.run_number }}-Linux.deb
-        asset_name: helloworld-0.0.${{ github.run_number }}-Linux.deb
+        upload_url: ${{steps.create.outputs.upload_url}}
+        asset_path: ./build/helloworld-0.0.${{github.run_number}}-Linux.deb
+        asset_name: helloworld-0.0.${{github.run_number}}-Linux.deb
         asset_content_type: application/vnd.debian.binary-package
-          
-  my-build:
+
+  print:
     runs-on: ubuntu-latest
     # ждать завершения джоба build
     needs: [build]
     steps:
       # при помощи name обозначаем таски внутри джоба (они печатаются)
       - name: Hello Actions
-        run: echo "Hello Actions"
-#        run: echo "Git hash: ${{ env.var }} "
-      
+        #run: echo "VAR1 ${{VAR1}}"
+        #run: echo "Git hash: ${{ env.var }} "
