@@ -1,14 +1,20 @@
+# Имя может быть любое, но желательно без пробелов
 name: CMake
 
 on:
   push:
+    tags: [ mater ]
     branches: [ master ]
 
+# глобальные переменные
 env:
+  var: 10
+  var_uniq: ${{ github.sha }}
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
 jobs:
+  # build это просто имя - можно давать любое имя. Это будет название джоба. Каждый джоб запускается на своей виртуальной машине
   build:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -16,26 +22,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # чекаут нашего проекта
     - uses: actions/checkout@v3
 
+    # установка буста
     - run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
-    - name: Configure CMake
+
+    - name: Configure
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build
-      # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: cmake -B ${{github.workspace}}/build -DPATCH_VERSION=${{github.run_number}}
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build
+      
+    - name: Build DEB
+      run: cmake --build ${{github.workspace}}/build --target package
+      
+    - name: List
+      run: ls -la
+      
+    - name: Create
+      id: create
+      uses: actions/create-release@v1
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload 
+      id: upload
+      uses: actions/upload-release-asset@v1
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create.outputs.upload_url }}
+        asset_path: ./helloworld-0.0.${{ github.run_number }}-Linux.deb
+        asset_name: helloworld-0.0.${{ github.run_number }}-Linux.deb
+        asset_content_type: application/vnd.debian.binary-package
+          
+  my-build:
+    runs-on: ubuntu-latest
+    # ждать завершения джоба build
+    needs: [build]
+    steps:
+      # при помощи name обозначаем таски внутри джоба (они печатаются)
+      - name: Hello Actions
+        run: echo "Hello Actions"
+#        run: echo "Git hash: ${{ env.var }} "
       
