@@ -12,6 +12,7 @@ add_subdirectory(helloworld)
 add_subdirectory(lib)
 add_subdirectory(tests)
 
+
 install(TARGETS helloworld RUNTIME DESTINATION bin)
 install(TARGETS version RUNTIME DESTINATION lib)
 
